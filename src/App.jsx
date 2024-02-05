@@ -5,17 +5,33 @@ import {
   MenuUnfoldOutlined,
   UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
 } from "@ant-design/icons";
 
 import { Layout, Menu, Button, theme } from "antd";
-import ContentApp from "./Components/ContentApp";
-const { Header, Sider, Content, Footer } = Layout;
+const { Header, Sider, Content } = Layout;
 
 import "./App.css";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 
-function App() {
+function getNavLink(to, icon, text, location) {
+  return (
+    <Menu.Item key={to}>
+      <NavLink
+        className={({ isActive, isPending }) => {
+          !isPending ? isActive ? "ant-menu-item-selected" : "" : "";
+        }}
+        to={to}
+      >
+        {icon}
+        <span>{text}</span>
+      </NavLink>
+    </Menu.Item>
+  );
+}
+
+function App({ children }) {
   const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation("/");
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -84,30 +100,13 @@ function App() {
           <Menu
             theme="dark"
             mode="inline"
-            defaultSelectedKeys={["1"]}
-            items={[
-              {
-                key: "11",
-                icon: <UserOutlined />,
-                label: "Company A",
-              },
-              {
-                key: "1",
-                icon: <UserOutlined />,
-                label: "nav 1",
-              },
-              {
-                key: "2",
-                icon: <VideoCameraOutlined />,
-                label: "nav 2",
-              },
-              {
-                key: "3",
-                icon: <UploadOutlined />,
-                label: "nav 3",
-              },
-            ]}
-          />
+            inlineCollapsed={true}
+            selectedKeys={[location.pathname]}
+          >
+            {getNavLink("/documents", <UserOutlined />, "Documents",location)}
+            {getNavLink("/deadline", <UploadOutlined />, "Deadline",location)}
+            {getNavLink("/group", <UploadOutlined />, "Group",location)}
+          </Menu>
         </Sider>
         <Layout>
           <Content
@@ -118,15 +117,12 @@ function App() {
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
               position: "relative",
-              marginLeft:  collapsed ? "1vh" : "35vh",
+              marginLeft: collapsed ? "1vh" : "35vh",
               marginTop: "15vh",
             }}
           >
-            Content
-            <ContentApp></ContentApp>
+            {children || <Outlet />}
           </Content>
-
-          <Footer>El footer</Footer>
         </Layout>
       </Layout>
     </Layout>
